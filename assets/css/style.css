@@ -1,0 +1,16 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+#ha{
+    width:100%;
+    height:10%;
+}
+#map {
+    height: 600px;;
+}
+#sub-content{
+    float: left;
+}
