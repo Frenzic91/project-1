@@ -68,7 +68,7 @@ function checkLoginState() {
 }
 
 $(document).ready(function () {
-    $('#content').append('<fb:login-button id="fbli" scope="public_profile,email,user_posts,user_friends,user_location,publish_pages,manage_pages" onlogin="checkLoginState();"></fb:login-button>');
+    $('#content').append('<fb:login-button id="fbli" scope="public_profile,email,user_posts" onlogin="checkLoginState();"></fb:login-button>');
 
     $('body').on('click', '#ni', function () {
         $('#content').empty();
