@@ -39,13 +39,30 @@ function initMap() {
             cb.setConsumerKey("ayQmqxFELX2wk3TQroPflQk1T", "LddGI4JMJqgyAcSH5NNwrAYlmmCyW28QPGC93Bwih08ttvgDKi");
 
             var params = {
-                geocode: " " + pos.lat + "," + pos.lng + ",1mi "
+                geocode: " " + pos.lat + "," + pos.lng + ",1mi ",
+                count: 100
             };
             cb.__call(
                 "search_tweets",
                 params,
                 function (reply) {
-                     console.log(reply)
+                    console.log(reply.statuses);
+                    console.log(reply.statuses.length);
+
+                    for(var i = 0; i < reply.statuses.length; i++){
+                        var row = $("<tr>");
+                        row.append("<td>" + reply.statuses[i].user.screen_name)
+                        row.append("<td>" + reply.statuses[i].user.name)
+                        row.append("<td>")
+                        row.append("<td>" + reply.statuses[i].text);
+    
+                        if(reply.statuses[i].entities.urls.length !== 0){
+
+                            row.append("<td> <a href=" + reply.statuses[i].entities.urls[0].url + ">" + reply.statuses[i].entities.urls[0].url);
+                        }
+                        $("tbody").append(row);
+                    }
+
 
                     reply.statuses.forEach(loc => {
 
