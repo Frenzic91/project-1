@@ -69,14 +69,12 @@ function initMap() {
                             var row = $("<tr>");
                         row.append("<td>" + loc.user.screen_name)
                         row.append("<td>" + loc.user.name)
-                        var p1 = parseFloat(loc.coordinates.coordinates[1]);
-                        var p2 = parseFloat(loc.coordinates.coordinates[0]);
                         row.append("<td>" + parseInt(getDistance(pos,lpos)))
                         row.append("<td>" + loc.text);
     
                         if(loc.entities.urls.length !== 0){
 
-                            row.append("<td> <a href=" + loc.entities.urls[0].url + ">" + loc.entities.urls[0].url);
+                            row.append('<td> <a href=' + loc.entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
                         }
                         $("tbody").append(row);
                         }
