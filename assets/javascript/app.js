@@ -17,6 +17,9 @@ var map;
 var pos;
 var hpos;
 var hadd;
+var tweetsInfo;
+var dist = [];
+var recent = [];
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -49,38 +52,65 @@ function initMap() {
                     console.log(reply.statuses);
                     console.log(reply.statuses.length);
 
-                    for(var i = 0; i < reply.statuses.length; i++){
-                        
-                    }
+                    var i = 0;
+                    tweetsInfo = reply.statuses;
 
 
                     reply.statuses.forEach(loc => {
 
                         if (!loc.coordinates) {
-
+ 
                         }
                         else{
+
                             lpos = {
                                 lat:  parseFloat(loc.coordinates.coordinates[1]),
                                 lng:  parseFloat(loc.coordinates.coordinates[0])
                             };
-                            console.log(lpos)
+
+                            dist.push({
+                                "index": i,
+                                "distance": parseInt(getDistance(pos,lpos))
+                            });
+
+                            recent.push({
+                                "index": i,
+                                "distance": parseInt(getDistance(pos,lpos))
+                            });
+                            
                             addMarker(lpos);
-                            var row = $("<tr>");
-                        row.append("<td>" + loc.user.screen_name)
-                        row.append("<td>" + loc.user.name)
-                        row.append("<td>" + parseInt(getDistance(pos,lpos)))
-                        row.append("<td>" + loc.text);
-    
-                        if(loc.entities.urls.length !== 0){
-
-                            row.append('<td> <a href=' + loc.entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
                         }
-                        $("tbody").append(row);
-                        }
-                        
-
+                        i++;
                     });
+
+                    for(var i = 0; i < (dist.length - 1); i++){
+                        
+                        if(dist[i].distance > dist[i+1].distance){
+                            var copy = dist[i+1];
+                            dist[i+1] = dist[i];
+                            dist[i] = copy;
+                            i = -1;
+                        }
+                    }
+                    for(var i = 0; i < dist.length; i++){
+                        var row = $("<tr>");
+                        row.append("<td>" + tweetsInfo[recent[i].index].user.screen_name);
+                        row.append("<td>" + tweetsInfo[recent[i].index].user.name);
+                        row.append("<td>" + recent[i].distance);
+                        row.append("<td>" + tweetsInfo[recent[i].index].text);
+                        row.append('<td> <a href=' + tweetsInfo[recent[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
+                        $("tbody").append(row);
+                    }
+
+                    // for(var i = 0; i < dist.length; i++){
+                    //     var row = $("<tr>");
+                    //     row.append("<td>" + reply.statuses[dist[i].index].user.screen_name);
+                    //     row.append("<td>" + reply.statuses[dist[i].index].user.name);
+                    //     row.append("<td>" + dist[i].distance);
+                    //     row.append("<td>" + reply.statuses[dist[i].index].text);
+                    //     row.append('<td> <a href=' + reply.statuses[dist[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
+                    //     $("tbody").append(row);
+                    // }
                 }
             );
 
@@ -93,6 +123,33 @@ function initMap() {
         handleLocationError(false, map.getCenter());
     }
 }
+
+$("#recent").click(function(){
+    $("tbody").empty();
+    for(var i = 0; i < dist.length; i++){
+        var row = $("<tr>");
+        row.append("<td>" + tweetsInfo[recent[i].index].user.screen_name);
+        row.append("<td>" + tweetsInfo[recent[i].index].user.name);
+        row.append("<td>" + recent[i].distance);
+        row.append("<td>" + tweetsInfo[recent[i].index].text);
+        row.append('<td> <a href=' + tweetsInfo[recent[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
+        $("tbody").append(row);
+    }
+});
+
+$("#sortDist").click(function(){
+    $("tbody").empty();
+
+    for(var i = 0; i < dist.length; i++){
+        var row = $("<tr>");
+        row.append("<td>" + tweetsInfo[dist[i].index].user.screen_name);
+        row.append("<td>" + tweetsInfo[dist[i].index].user.name);
+        row.append("<td>" + dist[i].distance);
+        row.append("<td>" + tweetsInfo[dist[i].index].text);
+        row.append('<td> <a href=' + tweetsInfo[dist[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
+        $("tbody").append(row);
+    }
+});
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.setPosition(pos);
