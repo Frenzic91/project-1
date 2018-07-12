@@ -84,7 +84,6 @@ function initMap() {
                     });
 
                     for(var i = 0; i < (dist.length - 1); i++){
-                        
                         if(dist[i].distance > dist[i+1].distance){
                             var copy = dist[i+1];
                             dist[i+1] = dist[i];
@@ -92,25 +91,8 @@ function initMap() {
                             i = -1;
                         }
                     }
-                    for(var i = 0; i < dist.length; i++){
-                        var row = $("<tr>");
-                        row.append("<td>" + tweetsInfo[recent[i].index].user.screen_name);
-                        row.append("<td>" + tweetsInfo[recent[i].index].user.name);
-                        row.append("<td>" + recent[i].distance);
-                        row.append("<td>" + tweetsInfo[recent[i].index].text);
-                        row.append('<td> <a href=' + tweetsInfo[recent[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
-                        $("tbody").append(row);
-                    }
 
-                    // for(var i = 0; i < dist.length; i++){
-                    //     var row = $("<tr>");
-                    //     row.append("<td>" + reply.statuses[dist[i].index].user.screen_name);
-                    //     row.append("<td>" + reply.statuses[dist[i].index].user.name);
-                    //     row.append("<td>" + dist[i].distance);
-                    //     row.append("<td>" + reply.statuses[dist[i].index].text);
-                    //     row.append('<td> <a href=' + reply.statuses[dist[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
-                    //     $("tbody").append(row);
-                    // }
+                    rowSort(tweetsInfo, recent);
                 }
             );
 
@@ -125,31 +107,26 @@ function initMap() {
 }
 
 $("#recent").click(function(){
-    $("tbody").empty();
-    for(var i = 0; i < dist.length; i++){
-        var row = $("<tr>");
-        row.append("<td>" + tweetsInfo[recent[i].index].user.screen_name);
-        row.append("<td>" + tweetsInfo[recent[i].index].user.name);
-        row.append("<td>" + recent[i].distance);
-        row.append("<td>" + tweetsInfo[recent[i].index].text);
-        row.append('<td> <a href=' + tweetsInfo[recent[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
-        $("tbody").append(row);
-    }
+    rowSort(tweetsInfo, recent);
 });
 
 $("#sortDist").click(function(){
+    rowSort(tweetsInfo, dist);
+});
+
+function rowSort(info, sortTable){
     $("tbody").empty();
 
     for(var i = 0; i < dist.length; i++){
         var row = $("<tr>");
-        row.append("<td>" + tweetsInfo[dist[i].index].user.screen_name);
-        row.append("<td>" + tweetsInfo[dist[i].index].user.name);
-        row.append("<td>" + dist[i].distance);
-        row.append("<td>" + tweetsInfo[dist[i].index].text);
-        row.append('<td> <a href=' + tweetsInfo[dist[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
+        row.append("<td>" + info[sortTable[i].index].user.screen_name);
+        row.append("<td>" + info[sortTable[i].index].user.name);
+        row.append("<td>" + sortTable[i].distance);
+        row.append("<td>" + info[sortTable[i].index].text);
+        row.append('<td> <a href=' + info[sortTable[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
         $("tbody").append(row);
     }
-});
+}
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.setPosition(pos);
