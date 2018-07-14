@@ -59,7 +59,7 @@ function initMap() {
 
                     reply.statuses.forEach(loc => {
 
-                        if (!loc.coordinates) {
+                        if (!loc.coordinates || !loc.entities.urls[0]) {
  
                         }
                         else{
@@ -130,7 +130,13 @@ $("#submit").click(function(event){
 function rowSort(info, sortTable){
     $("tbody").empty();
 
-    for(var i = 0; i < dist.length; i++){
+
+    for(var i = 0; i < sortTable.length; i++){
+        
+        if(!info[sortTable[i].index].entities.urls[0]){
+
+        }
+        else{
         var row = $("<tr>");
         row.append("<td>" + info[sortTable[i].index].user.screen_name);
         row.append("<td>" + info[sortTable[i].index].user.name);
@@ -138,6 +144,7 @@ function rowSort(info, sortTable){
         row.append("<td>" + info[sortTable[i].index].text);
         row.append('<td> <a href=' + info[sortTable[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
         $("tbody").append(row);
+        }
     }
 }
 
