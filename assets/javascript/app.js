@@ -20,6 +20,7 @@ var hadd;
 var tweetsInfo;
 var dist = [];
 var recent = [];
+var add = true;
 
 $("form").hide()
 
@@ -32,12 +33,74 @@ function initMap() {
 
     // Try HTML5 geolocation.
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-            addMarker(pos);
+        console.log(add);
+        if (add) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                map.setCenter(pos);
+                console.log(pos);
+                var cb = new Codebird;
+                cb.setConsumerKey("ayQmqxFELX2wk3TQroPflQk1T", "LddGI4JMJqgyAcSH5NNwrAYlmmCyW28QPGC93Bwih08ttvgDKi");
+
+                var params = {
+                    geocode: " " + pos.lat + "," + pos.lng + ",1mi ",
+                    count: 100
+                };
+                cb.__call(
+                    "search_tweets",
+                    params,
+                    function (reply) {
+                        console.log(reply.statuses);
+                        console.log(reply.statuses.length);
+
+                        var i = 0;
+                        tweetsInfo = reply.statuses;
+
+                        reply.statuses.forEach(loc => {
+
+                            if (!loc.coordinates || !loc.entities.urls[0]) {
+
+                            }
+                            else {
+                                lpos = {
+                                    lat: parseFloat(loc.coordinates.coordinates[1]),
+                                    lng: parseFloat(loc.coordinates.coordinates[0])
+                                };
+
+                                dist.push({
+                                    "index": i,
+                                    "distance": parseInt(getDistance(pos, lpos))
+                                });
+
+                                recent.push({
+                                    "index": i,
+                                    "distance": parseInt(getDistance(pos, lpos))
+                                });
+
+                                addMarker(lpos);
+                            }
+                            i++;
+                        });
+
+                        for (var i = 0; i < (dist.length - 1); i++) {
+                            if (dist[i].distance > dist[i + 1].distance) {
+                                var copy = dist[i + 1];
+                                dist[i + 1] = dist[i];
+                                dist[i] = copy;
+                                i = -1;
+                            }
+                        }
+                        rowSort(tweetsInfo, recent);
+                    }
+                );
+            }, function () {
+                handleLocationError(true, map.getCenter());
+            });
+        } else {
+
             map.setCenter(pos);
 
             var cb = new Codebird;
@@ -53,97 +116,99 @@ function initMap() {
                 function (reply) {
                     console.log(reply.statuses);
                     console.log(reply.statuses.length);
+                    if (!reply.statuses.coordinates || !reply.statuses.entities.urls[0]) {
 
-                    var i = 0;
-                    tweetsInfo = reply.statuses;
+                    }
+                    else {
+                        var i = 0;
+                        tweetsInfo = reply.statuses;
 
-                    reply.statuses.forEach(loc => {
+                        reply.statuses.forEach(loc => {
 
-                        if (!loc.coordinates || !loc.entities.urls[0]) {
- 
-                        }
-                        else{
+
+
                             lpos = {
-                                lat:  parseFloat(loc.coordinates.coordinates[1]),
-                                lng:  parseFloat(loc.coordinates.coordinates[0])
+                                lat: parseFloat(loc.coordinates.coordinates[1]),
+                                lng: parseFloat(loc.coordinates.coordinates[0])
                             };
 
                             dist.push({
                                 "index": i,
-                                "distance": parseInt(getDistance(pos,lpos))
+                                "distance": parseInt(getDistance(pos, lpos))
                             });
 
                             recent.push({
                                 "index": i,
-                                "distance": parseInt(getDistance(pos,lpos))
+                                "distance": parseInt(getDistance(pos, lpos))
                             });
-                            
-                            addMarker(lpos);
-                        }
-                        i++;
-                    });
 
-                    for(var i = 0; i < (dist.length - 1); i++){
-                        if(dist[i].distance > dist[i+1].distance){
-                            var copy = dist[i+1];
-                            dist[i+1] = dist[i];
-                            dist[i] = copy;
-                            i = -1;
+                            addMarker(lpos);
+
+                            i++;
+                        });
+
+                        for (var i = 0; i < (dist.length - 1); i++) {
+                            if (dist[i].distance > dist[i + 1].distance) {
+                                var copy = dist[i + 1];
+                                dist[i + 1] = dist[i];
+                                dist[i] = copy;
+                                i = -1;
+                            }
                         }
+                        rowSort(tweetsInfo, recent);
                     }
-                    rowSort(tweetsInfo, recent);
                 }
             );
-        }, function () {
-            handleLocationError(true, map.getCenter());
-        });
+        }
     } else {
         // Browser doesn't support Geolocationz
         handleLocationError(false, map.getCenter());
     }
 }
 
-$("#recent").click(function(){
+$("#recent").click(function () {
     rowSort(tweetsInfo, recent);
 });
 
-$("#sortDist").click(function(){
+$("#sortDist").click(function () {
     rowSort(tweetsInfo, dist);
 });
 
-$("#inputAdd").click(function(){
+$("#inputAdd").click(function () {
     $("form").show();
 });
 
-$("#currentLoco").click(function(){
+$("#currentLoco").click(function () {
     $("form").hide();
 });
 
-$("#submit").click(function(event){
+$("#submit").click(function (event) {
     event.preventDefault();
+    add = false;
+    var address = $("#address").val();
+    getLL(address);
+    console.log(pos);
 
-    console.log($("#address").val());
 
-    
-})
+});
 
-function rowSort(info, sortTable){
+function rowSort(info, sortTable) {
     $("tbody").empty();
 
 
-    for(var i = 0; i < sortTable.length; i++){
-        
-        if(!info[sortTable[i].index].entities.urls[0]){
+    for (var i = 0; i < sortTable.length; i++) {
+
+        if (!info[sortTable[i].index].entities.urls[0]) {
 
         }
-        else{
-        var row = $("<tr>");
-        row.append("<td>" + info[sortTable[i].index].user.screen_name);
-        row.append("<td>" + info[sortTable[i].index].user.name);
-        row.append("<td>" + sortTable[i].distance);
-        row.append("<td>" + info[sortTable[i].index].text);
-        row.append('<td> <a href=' + info[sortTable[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
-        $("tbody").append(row);
+        else {
+            var row = $("<tr>");
+            row.append("<td>" + info[sortTable[i].index].user.screen_name);
+            row.append("<td>" + info[sortTable[i].index].user.name);
+            row.append("<td>" + sortTable[i].distance);
+            row.append("<td>" + info[sortTable[i].index].text);
+            row.append('<td> <a href=' + info[sortTable[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
+            $("tbody").append(row);
         }
     }
 }
@@ -157,7 +222,6 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 }
 
 function getLL(address) {
-
     var queryURL = encodeURI('https://maps.googleapis.com/maps/api/geocode/json?address=' + address + '&key=AIzaSyCx7yMbCH5ACvx_95q_Rqr_nkx9hbSVppQ');
     $.ajax({
         url: queryURL,
@@ -165,13 +229,11 @@ function getLL(address) {
     }).then(function (response) {
         console.log(response);
         console.log(queryURL);
-        hpos = {
+        pos = {
             lat: response.results[0].geometry.location.lat,
             lng: response.results[0].geometry.location.lng
         };
-        addMarker(hpos);
-        getDistance(hpos, pos);
-        console.log(hpos);
+        initMap();
     });
 }
 
