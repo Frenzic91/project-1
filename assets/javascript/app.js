@@ -100,7 +100,7 @@ function initMap() {
                 handleLocationError(true, map.getCenter());
             });
         } else {
-
+            
             map.setCenter(pos);
 
             var cb = new Codebird;
@@ -116,17 +116,16 @@ function initMap() {
                 function (reply) {
                     console.log(reply.statuses);
                     console.log(reply.statuses.length);
-                    if (!reply.statuses.coordinates || !reply.statuses.entities.urls[0]) {
 
-                    }
-                    else {
-                        var i = 0;
-                        tweetsInfo = reply.statuses;
+                    var i = 0;
+                    tweetsInfo = reply.statuses;
 
-                        reply.statuses.forEach(loc => {
+                    reply.statuses.forEach(loc => {
 
+                        if (!loc.coordinates || !loc.entities.urls[0]) {
 
-
+                        }
+                        else {
                             lpos = {
                                 lat: parseFloat(loc.coordinates.coordinates[1]),
                                 lng: parseFloat(loc.coordinates.coordinates[0])
@@ -143,20 +142,22 @@ function initMap() {
                             });
 
                             addMarker(lpos);
-
-                            i++;
-                        });
-
-                        for (var i = 0; i < (dist.length - 1); i++) {
-                            if (dist[i].distance > dist[i + 1].distance) {
-                                var copy = dist[i + 1];
-                                dist[i + 1] = dist[i];
-                                dist[i] = copy;
-                                i = -1;
-                            }
                         }
-                        rowSort(tweetsInfo, recent);
+                        i++;
+                    });
+                    if (!reply.statuses.coordinates || ! reply.statuses.entities.urls[0]) {
+
+                    }else{
+                    for (var i = 0; i < (dist.length - 1); i++) {
+                        if (dist[i].distance > dist[i + 1].distance) {
+                            var copy = dist[i + 1];
+                            dist[i + 1] = dist[i];
+                            dist[i] = copy;
+                            i = -1;
+                        }
                     }
+                    rowSort(tweetsInfo, recent);
+                }
                 }
             );
         }
@@ -188,7 +189,7 @@ $("#submit").click(function (event) {
     var address = $("#address").val();
     getLL(address);
     console.log(pos);
-
+    
 
 });
 
