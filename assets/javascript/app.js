@@ -21,6 +21,8 @@ var tweetsInfo;
 var dist = [];
 var recent = [];
 
+$("form").hide()
+
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: -34.397, lng: 150.644 },
@@ -55,14 +57,12 @@ function initMap() {
                     var i = 0;
                     tweetsInfo = reply.statuses;
 
-
                     reply.statuses.forEach(loc => {
 
                         if (!loc.coordinates) {
  
                         }
                         else{
-
                             lpos = {
                                 lat:  parseFloat(loc.coordinates.coordinates[1]),
                                 lng:  parseFloat(loc.coordinates.coordinates[0])
@@ -91,12 +91,9 @@ function initMap() {
                             i = -1;
                         }
                     }
-
                     rowSort(tweetsInfo, recent);
                 }
             );
-
-
         }, function () {
             handleLocationError(true, map.getCenter());
         });
@@ -113,6 +110,22 @@ $("#recent").click(function(){
 $("#sortDist").click(function(){
     rowSort(tweetsInfo, dist);
 });
+
+$("#inputAdd").click(function(){
+    $("form").show();
+});
+
+$("#currentLoco").click(function(){
+    $("form").hide();
+});
+
+$("#submit").click(function(event){
+    event.preventDefault();
+
+    console.log($("#address").val());
+
+    
+})
 
 function rowSort(info, sortTable){
     $("tbody").empty();
