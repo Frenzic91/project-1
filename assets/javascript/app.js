@@ -130,7 +130,8 @@ $("#submit").click(function(event){
 function rowSort(info, sortTable){
     $("tbody").empty();
 
-
+    console.log(info.length);
+    console.log(sortTable.length);
     for(var i = 0; i < sortTable.length; i++){
         
         if(!info[sortTable[i].index].entities.urls[0]){
