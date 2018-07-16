@@ -122,12 +122,12 @@ function initMap() {
                                 lat: parseFloat(loc.coordinates.coordinates[1]),
                                 lng: parseFloat(loc.coordinates.coordinates[0])
                             };
-    
+
                             dist.push({
                                 "index": i,
                                 "distance": parseInt(getDistance(pos, lpos))
                             });
-    
+
                             recent.push({
                                 "index": i,
                                 "distance": parseInt(getDistance(pos, lpos))
@@ -170,12 +170,18 @@ $("#inputAdd").click(function () {
 $("#currentLoco").click(function () {
     $("form").hide();
     add = true;
+    dist = [];
+    recent = [];
+    $('#tableBody').empty();
     initMap();
 });
 
 $("#submit").click(function (event) {
     event.preventDefault();
     add = false;
+    dist = [];
+    recent = [];
+    $('#tableBody').empty();
     var address = $("#address").val();
     getLL(address);
 });
@@ -184,9 +190,9 @@ function rowSort(info, sortTable) {
     $("#tableBody").empty();
     var j = 0;
 
-    for(var i = 0; i < sortTable.length; i++){
-        
-        if(info[sortTable[i].index].entities.urls.length === 0){
+    for (var i = 0; i < sortTable.length; i++) {
+
+        if (info[sortTable[i].index].entities.urls.length === 0) {
 
         }
         else {
