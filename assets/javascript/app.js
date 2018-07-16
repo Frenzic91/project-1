@@ -1,17 +1,3 @@
-var config = {
-    apiKey: "AIzaSyB48Vx0hCvWOPeNMXwLM4Ci0n_Ho6_lYf8",
-    authDomain: "testproject-b18c8.firebaseapp.com",
-    databaseURL: "https://testproject-b18c8.firebaseio.com",
-    projectId: "testproject-b18c8",
-    storageBucket: "testproject-b18c8.appspot.com",
-    messagingSenderId: "343903222902"
-};
-firebase.initializeApp(config);
-
-// Note: This example requires that you consent to location sharing when
-// prompted by your browser. If you see the error "The Geolocation service
-// failed.", it means you probably did not give permission for the browser to
-// locate you.
 var googApiKey = "AIzaSyCx7yMbCH5ACvx_95q_Rqr_nkx9hbSVppQ";
 var map;
 var pos;
@@ -76,7 +62,7 @@ function initMap() {
                                     "distance": parseInt(getDistance(pos, lpos))
                                 });
 
-                                addMarker(lpos);
+                                addMarker(lpos, loc,parseInt(getDistance(pos, lpos)));
                             }
                             i++;
                         });
@@ -132,7 +118,7 @@ function initMap() {
                                 "index": i,
                                 "distance": parseInt(getDistance(pos, lpos))
                             });
-                            addMarker(lpos);
+                            addMarker(lpos, loc,parseInt(getDistance(pos, lpos)));
                         }
                         i++;
                     });
@@ -201,7 +187,7 @@ function rowSort(info, sortTable) {
             row.append("<td>" + info[sortTable[i].index].user.name);
             row.append("<td>" + sortTable[i].distance);
             row.append("<td>" + info[sortTable[i].index].text);
-            row.append('<td> <a href=' + info[sortTable[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
+            row.append('<td> <a target="_blank" href=' + info[sortTable[i].index].entities.urls[0].url + '> <button type="button" class="btn btn-primary">View Tweet</button>');
             $("tbody").append(row);
             j++;
         }
@@ -230,10 +216,35 @@ function getLL(address) {
     });
 }
 
-function addMarker(coords) {
+function addMarker(coords, info, dist) {
+
+    var content = '<div id="content">' +
+        '<div id="siteNotice">' +
+        '</div>' +
+        '<h3 id="firstHeading">' + info.user.screen_name + '</h3>' +
+        '<h4 id="firstHeading">' + info.user.name + '</h4>' +
+        '<div id="bodyContent">' +
+        '<a target="_blank" href=' + info.entities.urls[0].url + '><p>' + info.text + '</p></a>' +
+        '<h6 id="firstHeading">' + dist + ' meters</h6>' +
+        '</div>' +
+        '</div>';
+
     new google.maps.Marker({
         position: coords,
         map: map
+    });
+
+    var infowindow = new google.maps.InfoWindow({
+        content: content
+    });
+
+    var marker = new google.maps.Marker({
+        position: coords,
+        map: map,
+    });
+
+    marker.addListener('click', function () {
+        infowindow.open(map, marker);
     });
 }
 
